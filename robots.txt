@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://fintech-ad-infra.pages.dev/sitemap.xml
+Sitemap: https://fintechadinfra.com/sitemap.xml
