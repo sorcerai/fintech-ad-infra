@@ -33,8 +33,8 @@
             }
           },
           fontFamily: {
-            sans: [""Plus Jakarta Sans"", "sans-serif"],
-            mono: [""JetBrains Mono"", "monospace"]
+            sans: ["Plus Jakarta Sans", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
           }
         }
       }
@@ -58,7 +58,7 @@
       document.addEventListener("click", function(e) {
         var target = e.target && e.target.closest ? e.target.closest("a[href*=\"wa.me\"]") : null;
         if (target && window.searchOps && typeof window.searchOps.track === "function") {
-          window.searchOps.track("lead_confirmed");
+          window.searchOps.track("whatsapp_click");
         }
       });
     });
