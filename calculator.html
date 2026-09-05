@@ -76,20 +76,20 @@
     <div class="p-6 sm:p-8 rounded-2xl bg-brand-surface border border-brand-border space-y-6">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
-          <label class="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">Monthly Media Spend ($)</label>
-          <input type="number" id="monthlySpend" value="120000" min="20000" step="10000" class="w-full px-4 py-3 rounded-lg bg-brand-card border border-brand-border text-white font-mono focus:border-brand focus:outline-none" />
+          <label for="monthlySpend" class="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">Monthly Media Spend ($)</label>
+          <input type="number" id="monthlySpend" aria-label="Monthly Media Spend ($)" value="120000" min="20000" step="10000" class="w-full px-4 py-3 rounded-lg bg-brand-card border border-brand-border text-white font-mono focus:border-brand focus:outline-none" />
         </div>
         <div>
-          <label class="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">Average Funded Loan Origination Fee ($)</label>
-          <input type="number" id="feePerLoan" value="6500" min="1000" step="500" class="w-full px-4 py-3 rounded-lg bg-brand-card border border-brand-border text-white font-mono focus:border-brand focus:outline-none" />
+          <label for="feePerLoan" class="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">Average Funded Loan Origination Fee ($)</label>
+          <input type="number" id="feePerLoan" aria-label="Average Funded Loan Origination Fee ($)" value="6500" min="1000" step="500" class="w-full px-4 py-3 rounded-lg bg-brand-card border border-brand-border text-white font-mono focus:border-brand focus:outline-none" />
         </div>
         <div>
-          <label class="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">Number of Full-Time Loan Brokers</label>
-          <input type="number" id="brokerCount" value="12" min="1" max="100" class="w-full px-4 py-3 rounded-lg bg-brand-card border border-brand-border text-white font-mono focus:border-brand focus:outline-none" />
+          <label for="brokerCount" class="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">Number of Full-Time Loan Brokers</label>
+          <input type="number" id="brokerCount" aria-label="Number of Full-Time Loan Brokers" value="12" min="1" max="100" class="w-full px-4 py-3 rounded-lg bg-brand-card border border-brand-border text-white font-mono focus:border-brand focus:outline-none" />
         </div>
         <div>
-          <label class="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">Campaign Downtime Duration (Days)</label>
-          <input type="number" id="outageDays" value="5" min="1" max="30" class="w-full px-4 py-3 rounded-lg bg-brand-card border border-brand-border text-white font-mono focus:border-brand focus:outline-none" />
+          <label for="outageDays" class="block text-xs font-mono text-slate-300 uppercase tracking-wider mb-2">Campaign Downtime Duration (Days)</label>
+          <input type="number" id="outageDays" aria-label="Campaign Downtime Duration (Days)" value="5" min="1" max="30" class="w-full px-4 py-3 rounded-lg bg-brand-card border border-brand-border text-white font-mono focus:border-brand focus:outline-none" />
         </div>
       </div>
 
