@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Enterprise Fintech, MCA & Regulated Lending Ad Infrastructure",
   "scripts": {
-    "deploy": "wrangler pages deploy ."
+    "deploy": "wrangler pages deploy .",
+    "submit:indexnow": "node scripts/indexnow-submit.mjs"
   }
 }
