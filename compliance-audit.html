@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fintech &amp; Lending Ad Compliance Audit Tool | Fintech Ad Infrastructure</title>
+  <meta name="description" content="Interactive regulatory compliance audit for commercial lending, MCA, and credit advertising across Meta and Google Ads.">
+  <link rel="canonical" href="https://fintech-ad-infra.pages.dev/compliance-audit.html">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: "#27F17B",
+              dark: "#1ecb66",
+              bg: "#080B10",
+              surface: "#0E1420",
+              card: "#141C2E",
+              border: "#1E293B",
+              text: "#E2E8F0",
+              textMuted: "#94A3B8"
+            }
+          },
+          fontFamily: {
+            sans: [""Plus Jakarta Sans"", "sans-serif"],
+            mono: [""JetBrains Mono"", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <script defer src="https://search-ops-beacon.aria-24d.workers.dev/analytics/v2.js" data-site="fintechadinfra.com"></script>
+</head>
+<body class="bg-brand-bg text-brand-text font-sans antialiased selection:bg-brand selection:text-black">
+
+  <header class="sticky top-0 z-50 border-b border-brand-border bg-[#080B10]/95 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-brand flex items-center justify-center font-mono font-bold text-black text-xs">FT</div>
+        <span class="font-bold text-white text-base sm:text-lg tracking-tight">Fintech<span class="text-brand">AdInfra</span></span>
+      </a>
+      <span class="text-xs uppercase tracking-widest font-mono text-brand-textMuted border-l border-brand-border pl-3 ml-1 hidden sm:inline">Compliance Audit</span>
+    </div>
+    <nav class="flex items-center gap-4 text-xs sm:text-sm font-mono">
+      <a href="index.html" class="text-slate-300 hover:text-brand transition-colors">Overview</a>
+      <a href="calculator.html" class="text-slate-300 hover:text-brand transition-colors hidden sm:inline">Loss Calculator</a>
+      <a href="resources/index.html" class="text-slate-300 hover:text-brand transition-colors">Resources</a>
+      <a href="https://wa.me/15083103096?text=Hi%2C%20I%20want%20to%20audit%20our%20lending%20ad%20compliance." target="_blank" rel="noopener" class="px-3.5 py-1.5 rounded-lg bg-brand text-black font-semibold text-xs uppercase tracking-wider hover:bg-brand-dark transition-colors font-mono">
+        Audit Compliance
+      </a>
+    </nav>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-12">
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 border border-brand/30 text-brand text-xs font-mono font-bold uppercase tracking-wider mb-4">
+        Regulatory Diagnostic // Lending &amp; Credit
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+        Fintech &amp; Lending Ad Compliance Audit Tool
+      </h1>
+      <p class="text-slate-400 text-sm">
+        Audit your landing page disclosure shields, Meta Special Ad Category isolation, and Google Financial Services Verification status.
+      </p>
+    </div>
+
+    <!-- Diagnostic Checklist -->
+    <div class="p-6 sm:p-8 rounded-2xl bg-brand-surface border border-brand-border space-y-6">
+      <div class="space-y-4">
+        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-brand-card border border-brand-border cursor-pointer hover:border-brand/40 transition-colors">
+          <input type="checkbox" id="q1" checked class="mt-1 accent-[#27F17B]" />
+          <div>
+            <div class="text-sm font-bold text-white">Representative APR &amp; Fee Disclosure on First Screen</div>
+            <div class="text-xs text-slate-400 mt-0.5">Landing pages display compliant factor rate or APR ranges prior to lead capture submission.</div>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-brand-card border border-brand-border cursor-pointer hover:border-brand/40 transition-colors">
+          <input type="checkbox" id="q2" checked class="mt-1 accent-[#27F17B]" />
+          <div>
+            <div class="text-sm font-bold text-white">Meta Credit / Special Ad Category Segregated BM</div>
+            <div class="text-xs text-slate-400 mt-0.5">Credit campaigns are hosted in dedicated Business Portfolios, air-gapping non-credit assets.</div>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-brand-card border border-brand-border cursor-pointer hover:border-brand/40 transition-colors">
+          <input type="checkbox" id="q3" class="mt-1 accent-[#27F17B]" />
+          <div>
+            <div class="text-sm font-bold text-white">Pre-Attested Google Financial Services Verification (FSV) MCC</div>
+            <div class="text-xs text-slate-400 mt-0.5">Manager accounts hold verified corporate state brokerage filings and NMLS credentials.</div>
+          </div>
+        </label>
+
+        <label class="flex items-start gap-3 p-3.5 rounded-xl bg-brand-card border border-brand-border cursor-pointer hover:border-brand/40 transition-colors">
+          <input type="checkbox" id="q4" class="mt-1 accent-[#27F17B]" />
+          <div>
+            <div class="text-sm font-bold text-white">Invoiced Agency Ad Accounts ($100K+/Day Line)</div>
+            <div class="text-xs text-slate-400 mt-0.5">Direct credit settlement eliminating credit card velocity holds during heavy capital deployment.</div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Score meter -->
+      <div class="pt-6 border-t border-brand-border/60 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <div class="text-xs font-mono text-slate-400 uppercase">Compliance Resilience Score</div>
+          <div id="scoreText" class="text-2xl font-bold text-amber-400 mt-1">Moderate Risk (50/100)</div>
+        </div>
+        <a id="auditCta" href="https://wa.me/15083103096?text=Hi%2C%20our%20fintech%20compliance%20audit%20scored%2050%2F100%20and%20we%20want%20to%20harden%20our%20ad%20infrastructure." target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-brand text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-brand-dark transition-all">
+          Request Compliance Hardening &rarr;
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function updateScore() {
+      const q1 = document.getElementById("q1").checked ? 25 : 0;
+      const q2 = document.getElementById("q2").checked ? 25 : 0;
+      const q3 = document.getElementById("q3").checked ? 25 : 0;
+      const q4 = document.getElementById("q4").checked ? 25 : 0;
+      const total = q1 + q2 + q3 + q4;
+
+      let status = "Critical Risk (0/100)";
+      let colorClass = "text-rose-400";
+      if (total >= 75) {
+        status = `Hardened Infrastructure (${total}/100)`;
+        colorClass = "text-brand";
+      } else if (total >= 50) {
+        status = `Moderate Risk (${total}/100)`;
+        colorClass = "text-amber-400";
+      } else {
+        status = `Severe Vulnerability (${total}/100)`;
+        colorClass = "text-rose-400";
+      }
+
+      const scoreEl = document.getElementById("scoreText");
+      scoreEl.className = `text-2xl font-bold ${colorClass} mt-1`;
+      scoreEl.innerText = status;
+
+      const text = encodeURIComponent(`Hi, our fintech compliance audit scored ${total}/100 and we want to harden our ad infrastructure.`);
+      document.getElementById("auditCta").href = `https://wa.me/15083103096?text=${text}`;
+    }
+
+    ["q1", "q2", "q3", "q4"].forEach(id => {
+      document.getElementById(id).addEventListener("change", updateScore);
+    });
+    updateScore();
+  </script>
+
+  <footer class="border-t border-brand-border py-8 text-center text-xs text-slate-500 font-mono mt-16">
+    <p>&copy; 2026 Fintech Ad Infrastructure &bull; An enterprise intelligence initiative by <a href="https://adsinfra.io" class="text-brand">AdsInfra</a>.</p>
+  </footer>
+</body>
+</html>

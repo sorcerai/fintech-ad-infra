@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fintech-ad-infra.pages.dev/sitemap.xml
