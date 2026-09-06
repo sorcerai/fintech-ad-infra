@@ -2,3 +2,6 @@ node_modules/
 .DS_Store
 .wrangler/
 dist/
+
+# Local credentials (push-indexer deploy key). Never commit.
+.env
