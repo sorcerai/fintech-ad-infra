@@ -114,11 +114,9 @@
           referrer_host: "",
           attribution: attribution(),
           form_variant: "contact_form_v1",
+          company: bounded(values.get("company"), 160),
+          message: bounded(values.get("message"), 2000),
         };
-        const company = bounded(values.get("company"), 160);
-        const message = bounded(values.get("message"), 2000);
-        if (company) body.company = company;
-        if (message) body.message = message;
         try {
           body.referrer_host = bounded(new URL(document.referrer).hostname, 253);
         } catch {
