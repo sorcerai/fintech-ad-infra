@@ -51,7 +51,7 @@
     </div>
     <nav class="flex items-center gap-4 text-xs sm:text-sm font-mono">
       <a href="/" class="text-slate-300 hover:text-brand transition-colors hidden sm:inline-flex min-h-[28px] items-center">Overview</a>
-      <a href="index.html#pricing" class="text-slate-300 hover:text-brand transition-colors hidden sm:inline-flex min-h-[28px] items-center">Pricing &amp; SLAs</a>
+      <a href="index.html#pricing" class="text-slate-300 hover:text-brand transition-colors hidden sm:inline-flex min-h-[28px] items-center">Pricing</a>
       <a href="calculator" class="text-slate-300 hover:text-brand transition-colors hidden sm:inline">Loss Calculator</a>
       <a href="resources/index" class="text-slate-300 hover:text-brand transition-colors inline-flex items-center min-h-[28px] py-1 px-1">Resources</a>
       <a href="https://wa.me/15083103096?text=Hi%2C%20I%20want%20to%20audit%20our%20lending%20ad%20compliance." target="_blank" rel="noopener" class="px-3.5 py-1.5 rounded-lg bg-brand text-black font-semibold text-xs uppercase tracking-wider hover:bg-brand-dark transition-colors font-mono">
@@ -69,7 +69,7 @@
         Fintech &amp; Lending Ad Compliance Audit Tool
       </h1>
       <p class="text-slate-400 text-sm">
-        Audit your landing page disclosure shields, Meta Special Ad Category isolation, and Google Financial Services Verification status.
+        Review your landing-page disclosures, platform requirements, account structure, and billing dependencies.
       </p>
     </div>
 
@@ -87,24 +87,24 @@
         <label class="flex items-start gap-3 p-3.5 rounded-xl bg-brand-card border border-brand-border cursor-pointer hover:border-brand/40 transition-colors">
           <input type="checkbox" id="q2" checked class="mt-1 accent-[#27F17B]" />
           <div>
-            <div class="text-sm font-bold text-white">Meta Credit / Special Ad Category Segregated BM</div>
-            <div class="text-xs text-slate-400 mt-0.5">Credit campaigns are hosted in dedicated Business Portfolios, air-gapping non-credit assets.</div>
+            <div class="text-sm font-bold text-white">Meta Credit / Special Ad Category Setup</div>
+            <div class="text-xs text-slate-400 mt-0.5">Review campaign structure, targeting limits, and the separation of relevant assets and access.</div>
           </div>
         </label>
 
         <label class="flex items-start gap-3 p-3.5 rounded-xl bg-brand-card border border-brand-border cursor-pointer hover:border-brand/40 transition-colors">
           <input type="checkbox" id="q3" class="mt-1 accent-[#27F17B]" />
           <div>
-            <div class="text-sm font-bold text-white">Pre-Attested Google Financial Services Verification (FSV) MCC</div>
-            <div class="text-xs text-slate-400 mt-0.5">Manager accounts hold verified corporate state brokerage filings and NMLS credentials.</div>
+            <div class="text-sm font-bold text-white">Google Financial Services Verification Materials</div>
+            <div class="text-xs text-slate-400 mt-0.5">Review the business, licensing, and landing-page materials relevant to the applicable market.</div>
           </div>
         </label>
 
         <label class="flex items-start gap-3 p-3.5 rounded-xl bg-brand-card border border-brand-border cursor-pointer hover:border-brand/40 transition-colors">
           <input type="checkbox" id="q4" class="mt-1 accent-[#27F17B]" />
           <div>
-            <div class="text-sm font-bold text-white">Invoiced Agency Ad Accounts ($100K+/Day Line)</div>
-            <div class="text-xs text-slate-400 mt-0.5">Direct credit settlement eliminating credit card velocity holds during heavy capital deployment.</div>
+            <div class="text-sm font-bold text-white">Billing and Account Setup</div>
+            <div class="text-xs text-slate-400 mt-0.5">Review payment methods, account access, and billing dependencies before campaign delivery.</div>
           </div>
         </label>
       </div>
@@ -112,11 +112,11 @@
       <!-- Score meter -->
       <div class="pt-6 border-t border-brand-border/60 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
-          <div class="text-xs font-mono text-slate-400 uppercase">Compliance Resilience Score</div>
+          <div class="text-xs font-mono text-slate-400 uppercase">Review Readiness Score</div>
           <div id="scoreText" class="text-2xl font-bold text-amber-400 mt-1">Moderate Risk (50/100)</div>
         </div>
-        <a id="auditCta" href="https://wa.me/15083103096?text=Hi%2C%20our%20fintech%20compliance%20audit%20scored%2050%2F100%20and%20we%20want%20to%20harden%20our%20ad%20infrastructure." target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-brand text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-brand-dark transition-all">
-          Request Compliance Hardening &rarr;
+        <a id="auditCta" href="https://wa.me/15083103096?text=Hi%2C%20our%20fintech%20review%20scored%2050%2F100%20and%20we%20want%20to%20discuss%20our%20ad%20infrastructure." target="_blank" rel="noopener" class="px-6 py-3 rounded-xl bg-brand text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-brand-dark transition-all">
+          Request a Review &rarr;
         </a>
       </div>
     </div>
@@ -133,7 +133,7 @@
       let status = "Critical Risk (0/100)";
       let colorClass = "text-rose-400";
       if (total >= 75) {
-        status = `Hardened Infrastructure (${total}/100)`;
+        status = `Ready for Review (${total}/100)`;
         colorClass = "text-brand";
       } else if (total >= 50) {
         status = `Moderate Risk (${total}/100)`;
@@ -147,7 +147,7 @@
       scoreEl.className = `text-2xl font-bold ${colorClass} mt-1`;
       scoreEl.innerText = status;
 
-      const text = encodeURIComponent(`Hi, our fintech compliance audit scored ${total}/100 and we want to harden our ad infrastructure.`);
+      const text = encodeURIComponent(`Hi, our fintech review scored ${total}/100 and we want to discuss our ad infrastructure.`);
       document.getElementById("auditCta").href = `https://wa.me/15083103096?text=${text}`;
     }
 
