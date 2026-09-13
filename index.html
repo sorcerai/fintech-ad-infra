@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fintech Ad Infrastructure | Regulated Lending, MCA &amp; Credit Ad Operations</title>
-  <meta name="description" content="Never lose another lending funnel to Meta Special Ad Category bans, Google FSV holds, or $200+ CPC auction waste. Hardened Tier-1 agency ad accounts for MCA, fintech, and debt relief spending $80k-$1.2M+/mo.">
+  <meta name="description" content="Fintech and lending ad infrastructure for teams reviewing platform requirements, billing setup, and account continuity across Meta, Google, and LinkedIn.">
   <link rel="canonical" href="https://fintechadinfra.com/">
 
   <!-- Tailwind CSS CDN -->
@@ -67,6 +67,136 @@
       });
     });
   </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const ENDPOINT = "https://adsinfra.io/api/leads/satellite";
+      const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      const form = document.getElementById("contact-form");
+      if (!form) return;
+
+      const button = form.querySelector("button[type='submit']");
+      const status = document.getElementById("contact-status");
+      let frozenSubmission = null;
+      let formRevision = 0;
+
+      const newSubmissionId = () => {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+          return window.crypto.randomUUID();
+        }
+        const bytes = new Uint8Array(16);
+        window.crypto.getRandomValues(bytes);
+        bytes[6] = (bytes[6] & 0x0f) | 0x40;
+        bytes[8] = (bytes[8] & 0x3f) | 0x80;
+        const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+        return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+      };
+
+      const bounded = (value, max) => String(value || "").trim().slice(0, max);
+      const attribution = () => {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          utm_source: bounded(params.get("utm_source"), 200),
+          utm_medium: bounded(params.get("utm_medium"), 200),
+          utm_campaign: bounded(params.get("utm_campaign"), 200),
+          utm_content: bounded(params.get("utm_content"), 200),
+          utm_term: bounded(params.get("utm_term"), 200),
+        };
+      };
+
+      const draftSubmission = () => {
+        const values = new FormData(form);
+        const body = {
+          submission_id: "",
+          email: bounded(values.get("email"), 254),
+          need: bounded(values.get("need"), 40),
+          website: bounded(values.get("website"), 160),
+          source_path: bounded(window.location.pathname, 256),
+          referrer_host: "",
+          attribution: attribution(),
+          form_variant: "contact_form_v1",
+          company: bounded(values.get("company"), 160),
+          message: bounded(values.get("message"), 2000),
+        };
+        try {
+          body.referrer_host = bounded(new URL(document.referrer).hostname, 253);
+        } catch {
+          body.referrer_host = "";
+        }
+        const signatureBody = { ...body };
+        delete signatureBody.submission_id;
+        const signature = JSON.stringify(signatureBody);
+        if (!frozenSubmission
+          || frozenSubmission.revision !== formRevision
+          || frozenSubmission.signature !== signature) {
+          frozenSubmission = {
+            revision: formRevision,
+            signature,
+            body: { ...body, submission_id: newSubmissionId() },
+          };
+        }
+        return frozenSubmission.body;
+      };
+
+      const showStatus = (message, success = false) => {
+        status.textContent = message;
+        status.dataset.state = success ? "success" : "error";
+        status.classList.toggle("text-brand", success);
+        status.classList.toggle("text-rose-300", !success);
+      };
+
+      const isSuccessfulResponse = (response, payload) => {
+        if (![200, 201].includes(response.status) || !payload || typeof payload !== "object") return false;
+        const keys = Object.keys(payload).sort().join(",");
+        return keys === "already_completed,completion_id,ok"
+          && payload.ok === true
+          && payload.already_completed === (response.status === 200)
+          && typeof payload.completion_id === "string"
+          && UUID_RE.test(payload.completion_id);
+      };
+      form.addEventListener("input", () => {
+        formRevision += 1;
+      });
+      form.addEventListener("change", () => {
+        formRevision += 1;
+      });
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!form.reportValidity() || button.disabled) return;
+        const body = draftSubmission();
+        button.disabled = true;
+        button.textContent = "Sending…";
+        showStatus("Sending your request…");
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 10000);
+        try {
+          const response = await fetch(ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+            signal: controller.signal,
+          });
+          let payload = null;
+          try {
+            payload = await response.json();
+          } catch {
+            payload = null;
+          }
+          if (!isSuccessfulResponse(response, payload)) {
+            throw new Error("The request was not completed.");
+          }
+          showStatus("Thanks — we’ll review your request and reply by email.", true);
+        } catch {
+          showStatus("We couldn’t send that request. Please check your details and try again.");
+        } finally {
+          window.clearTimeout(timeout);
+          button.disabled = false;
+          button.textContent = "Request review";
+        }
+      });
+      button.disabled = false;
+    });
+  </script>
 
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
@@ -102,31 +232,9 @@
         "@id": "https://fintechadinfra.com/#service",
         "name": "Enterprise Fintech & Regulated Lending Ad Infrastructure",
         "provider": { "@id": "https://fintechadinfra.com/#organization" },
-        "serviceType": "Fintech Ad Operations, Special Ad Category Segregation & Invoiced Spend Lines",
-        "description": "Hardened Tier-1 agency ad accounts, Google FSV pre-attested hierarchies, and Special Ad Category compliance shields for MCA funders and commercial lenders.",
+        "serviceType": "Fintech Ad Operations, Platform Review & Billing Infrastructure",
+        "description": "Infrastructure review for fintech, MCA, and regulated lending teams covering account setup, Special Ad Category requirements, platform verification, billing, and continuity planning.",
         "areaServed": "Worldwide"
-      },
-      {
-        "@type": "FAQPage",
-        "@id": "https://fintechadinfra.com/#faq",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "How does Fintech Ad Infrastructure bypass Meta Special Ad Category audience targeting limits?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "While Special Ad Category strips demographic targeting, we deploy pre-qualifying creative hooks ($50k+/mo revenue thresholds) and post-click financial qualification quizzes to filter out subprime consumer traffic, reducing blended commercial borrower CAC by 40%."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What is Google Financial Services Verification (FSV) and how do you protect against holds?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Google FSV verifies state lending licenses and broker registration. We structure dedicated agency MCC accounts with pre-attested corporate financial verification bundles, ensuring zero downtime during campaign scaling."
-            }
-          }
-        ]
       }
     ]
   }
@@ -140,14 +248,14 @@
       <div class="flex items-center gap-2 overflow-hidden whitespace-nowrap">
         <span class="inline-block w-2 h-2 rounded-full bg-brand  shrink-0"></span>
         <span class="text-brand font-bold uppercase tracking-wider text-[11px]">FINTECH AD RADAR:</span>
-        <span class="text-slate-300 truncate">Meta Special Ad Category enforcement wave active • Google FSV audit queue: 48h delay • Clearing CPCs on MCA: $148.20 avg.</span>
+        <span class="text-slate-300 truncate">Platform rules and review requirements change. We help fintech teams prepare account, billing, and landing-page details for review.</span>
       </div>
       <div class="hidden sm:flex items-center gap-3 shrink-0 text-slate-400">
-        <span>SLA: &lt;4h Deployment</span>
+        <span>Platform review required</span>
         <span>•</span>
-        <span>Unlimited Spend</span>
+        <span>Billing setup review</span>
         <span>•</span>
-        <span class="text-brand font-semibold">FSV Pre-Attested</span>
+        <span class="text-brand font-semibold">Human response by email</span>
       </div>
     </div>
   </aside>
@@ -165,8 +273,8 @@
       <a href="calculator" class="text-slate-300 hover:text-brand transition-colors hidden md:inline">Loss Calculator</a>
       <a href="compliance-audit" class="text-slate-300 hover:text-brand transition-colors hidden sm:inline">Compliance Audit</a>
       <a href="resources/index" class="text-slate-300 hover:text-brand transition-colors inline-flex items-center min-h-[28px] py-1 px-1.5 inline-flex items-center min-h-[28px] py-1 px-1">Resources</a>
-      <a href="https://wa.me/15083103096?text=Hi%2C%20I%20need%20enterprise%20fintech%20and%20lending%20ad%20infrastructure." target="_blank" rel="noopener" class="px-3.5 py-1.5 rounded-lg bg-brand text-black font-semibold text-xs uppercase tracking-wider hover:bg-brand-dark transition-colors font-mono">
-        Request Access
+      <a href="#contact" class="px-3.5 py-1.5 rounded-lg bg-brand text-black font-semibold text-xs uppercase tracking-wider hover:bg-brand-dark transition-colors font-mono">
+        Request review
       </a>
     </nav>
   </header>
@@ -179,55 +287,55 @@
       </div>
       
       <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 max-w-4xl mx-auto">
-        Never Lose Another Lending Funnel to <span class="text-brand">Special Ad Category Bans</span> or <span class="text-brand-cyan">$200+ CPC Waste</span>
+        Fintech Ad Infrastructure for <span class="text-brand">Platform Review</span> and <span class="text-brand-cyan">Account Continuity</span>
       </h1>
       
       <p class="text-slate-400 text-base sm:text-lg max-w-3xl mx-auto mb-10 leading-relaxed">
-        Commercial lending auctions are unforgiving. We structure air-gapped Tier-1 agency ad accounts, regulatory landing page compliance shields, and invoiced capital lines for MCA funders, SMB lenders, and debt relief agencies spending $80k to $1.2M+/month.
+        We review account structure, billing setup, landing-page disclosures, and platform requirements for MCA, commercial lending, and fintech teams across Meta, Google, and LinkedIn. Eligibility and approval remain subject to each platform’s rules and review process.
       </p>
 
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-        <a href="https://wa.me/15083103096?text=Hi%2C%20I%20am%20spending%20%2480k%2B%2Fmo%20on%20fintech%20or%20MCA%20ads%20and%20need%20infrastructure." target="_blank" rel="noopener" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand text-black font-bold text-sm uppercase tracking-wider hover:bg-brand-dark transition-all duration-200 shadow-lg glow-accent font-mono flex items-center justify-center gap-2">
-          <span>Deploy Fintech Infrastructure on WhatsApp</span>
+        <a href="#contact" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand text-black font-bold text-sm uppercase tracking-wider hover:bg-brand-dark transition-all duration-200 shadow-lg glow-accent font-mono flex items-center justify-center gap-2">
+          <span>Request a fintech infrastructure review</span>
           <span>&rarr;</span>
         </a>
-        <a href="calculator" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-surface border border-brand-border hover:border-brand/40 text-white font-semibold text-sm transition-all duration-200 font-mono">
-          Run CAC Loss Calculator &rarr;
+        <a href="https://wa.me/15083103096?text=Hi%2C%20I%20need%20enterprise%20fintech%20and%20lending%20ad%20infrastructure." target="_blank" rel="noopener" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-surface border border-brand-border hover:border-brand/40 text-white font-semibold text-sm transition-all duration-200 font-mono">
+          Message the urgent WhatsApp desk &rarr;
         </a>
       </div>
 
       <!-- Trust Badges -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-brand-border/60">
         <div class="p-4 rounded-xl bg-brand-surface border border-brand-border/50 text-left">
-          <div class="text-xs font-mono text-brand mb-1">PROVISIONING SLA</div>
-          <div class="text-lg font-bold text-white">&lt; 4 Hours</div>
-          <div class="text-xs text-slate-400">Google, Meta, LinkedIn</div>
+          <div class="text-xs font-mono text-brand mb-1">ACCOUNT REVIEW</div>
+          <div class="text-lg font-bold text-white">Platform-specific</div>
+          <div class="text-xs text-slate-400">Meta, Google, LinkedIn</div>
         </div>
         <div class="p-4 rounded-xl bg-brand-surface border border-brand-border/50 text-left">
-          <div class="text-xs font-mono text-brand-cyan mb-1">GOOGLE FSV GATING</div>
-          <div class="text-lg font-bold text-white">Pre-Attested MCC</div>
-          <div class="text-xs text-slate-400">Zero licensing verification holds</div>
+          <div class="text-xs font-mono text-brand-cyan mb-1">FINANCIAL SERVICES</div>
+          <div class="text-lg font-bold text-white">Eligibility review</div>
+          <div class="text-xs text-slate-400">Licensing and disclosures</div>
         </div>
         <div class="p-4 rounded-xl bg-brand-surface border border-brand-border/50 text-left">
           <div class="text-xs font-mono text-amber-400 mb-1">SPECIAL AD CATEGORY</div>
-          <div class="text-lg font-bold text-white">100% Segregated</div>
-          <div class="text-xs text-slate-400">Credit campaigns air-gapped</div>
+          <div class="text-lg font-bold text-white">Targeting limits</div>
+          <div class="text-xs text-slate-400">Plan within platform rules</div>
         </div>
         <div class="p-4 rounded-xl bg-brand-surface border border-brand-border/50 text-left">
-          <div class="text-xs font-mono text-brand mb-1">INVOICED SPEND LINES</div>
-          <div class="text-lg font-bold text-white">$100K+ / Day</div>
-          <div class="text-xs text-slate-400">No credit card velocity declines</div>
+          <div class="text-xs font-mono text-brand mb-1">BILLING &amp; ACCESS</div>
+          <div class="text-lg font-bold text-white">Continuity planning</div>
+          <div class="text-xs text-slate-400">Review setup and dependencies</div>
         </div>
       </div>
     </section>
 
-    <!-- Failure Modes Section -->
+    <!-- Platform Review Constraints Section -->
     <section class="py-16 bg-brand-surface border-y border-brand-border">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <div class="text-center max-w-2xl mx-auto mb-12">
-          <h2 class="text-xs font-mono font-bold text-brand uppercase tracking-wider mb-2">Technical Vulnerability Analysis</h2>
+          <h2 class="text-xs font-mono font-bold text-brand uppercase tracking-wider mb-2">Platform Review Constraints</h2>
           <p class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            The Three Fatal Failure Modes in Lending Ad Operations
+            Plan for the Rules That Govern Fintech Advertising
           </p>
         </div>
 
@@ -235,34 +343,34 @@
           <div class="p-6 rounded-2xl bg-brand-bg border border-brand-border flex flex-col justify-between">
             <div>
               <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center font-mono font-bold text-sm mb-4">01</div>
-              <h3 class="text-lg font-bold text-white mb-2">Meta HEC Special Ad Category Lock</h3>
+              <h3 class="text-lg font-bold text-white mb-2">Special Ad Category Limits</h3>
               <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                Special Ad Category strips lookalikes, postal codes, and age filters. Unfiltered campaigns flood loan brokers with subprime, unqualified consumer leads, inflating commercial acquisition cost by 65%.
+                Meta may restrict audience and targeting options for credit and financial products. We map campaign structure and creative to the applicable platform requirements.
               </p>
             </div>
-            <div class="text-xs font-mono text-rose-400">Impact: 65% CAC Blowout</div>
+            <div class="text-xs font-mono text-rose-400">Review: Targeting and creative</div>
           </div>
 
           <div class="p-6 rounded-2xl bg-brand-bg border border-brand-border flex flex-col justify-between">
             <div>
               <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-mono font-bold text-sm mb-4">02</div>
-              <h3 class="text-lg font-bold text-white mb-2">Unacceptable Business Practice Bans</h3>
+              <h3 class="text-lg font-bold text-white mb-2">Financial Services Verification</h3>
               <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                Automated platform crawlers trigger instant ad account terminations for loan approval guarantees, missing representative APR examples, or aggressive debt eradication claim copy.
+                Google and other platforms can request business, licensing, and landing-page information. We help organize the relevant materials for the applicable market.
               </p>
             </div>
-            <div class="text-xs font-mono text-amber-400">Impact: Account Death</div>
+            <div class="text-xs font-mono text-amber-400">Review: Eligibility and disclosures</div>
           </div>
 
           <div class="p-6 rounded-2xl bg-brand-bg border border-brand-border flex flex-col justify-between">
             <div>
               <div class="w-10 h-10 rounded-xl bg-brand-cyan/10 text-brand-cyan flex items-center justify-center font-mono font-bold text-sm mb-4">03</div>
-              <h3 class="text-lg font-bold text-white mb-2">$200+ CPC Auction Bleed</h3>
+              <h3 class="text-lg font-bold text-white mb-2">Billing and Account Dependencies</h3>
               <p class="text-xs text-slate-400 leading-relaxed mb-4">
-                When Google Search auctions for terms like "merchant cash advance" clear at $180-$280/click, bot traffic and payment holds burn tens of thousands of dollars before underwriter review.
+                Account access, payment setup, and review status can affect delivery. We document dependencies and discuss continuity options without promising platform outcomes.
               </p>
             </div>
-            <div class="text-xs font-mono text-brand-cyan">Impact: $25k+ Daily Burn</div>
+            <div class="text-xs font-mono text-brand-cyan">Review: Setup and continuity</div>
           </div>
         </div>
       </div>
@@ -273,10 +381,10 @@
       <div class="text-center max-w-2xl mx-auto mb-16">
         <h2 class="text-xs font-mono font-bold text-brand uppercase tracking-wider mb-2">Lending Infrastructure Blueprint</h2>
         <p class="text-3xl font-extrabold text-white tracking-tight mb-4">
-          The Air-Gapped Financial Media Citadel
+          An Account and Billing Review Framework
         </p>
         <p class="text-slate-400 text-sm">
-          Complete structural isolation of regulated lending assets from primary business entities and payment rails.
+          A practical review of regulated lending assets, platform requirements, and operational dependencies.
         </p>
       </div>
 
@@ -284,76 +392,76 @@
         <div class="p-6 rounded-2xl bg-brand-surface border border-brand-border">
           <div class="flex items-center gap-3 mb-2">
             <span class="px-2.5 py-0.5 rounded bg-brand/10 text-brand font-mono font-bold text-xs uppercase">Layer 1</span>
-            <h3 class="text-base font-bold text-white">Pre-Attested Google FSV &amp; Meta Portfolios</h3>
+            <h3 class="text-base font-bold text-white">Business and Platform Eligibility</h3>
           </div>
           <p class="text-xs text-slate-400 leading-relaxed">
-            Every ad account operates within pre-verified financial service hierarchies. Corporate lending licenses, NMLS/state filings, and corporate legal entities are attested at the Master MCC level.
+            Review the business model, market, licensing position, landing-page disclosures, and the platform policies that apply to financial services advertising.
           </p>
         </div>
 
         <div class="p-6 rounded-2xl bg-brand-surface border border-brand-border">
           <div class="flex items-center gap-3 mb-2">
             <span class="px-2.5 py-0.5 rounded bg-brand-cyan/10 text-brand-cyan font-mono font-bold text-xs uppercase">Layer 2</span>
-            <h3 class="text-base font-bold text-white">Algorithmic Creative &amp; Post-Click Qualification Filter</h3>
+            <h3 class="text-base font-bold text-white">Campaign and Landing-Page Readiness</h3>
           </div>
           <p class="text-xs text-slate-400 leading-relaxed">
-            Because Meta Special Ad Category forbids demographic filtering, our creative framework acts as the firewall. First-3-second revenue callouts ($50k+/mo) and multi-step qualification quizzes eliminate junk leads before they reach sales teams.
+            Check claims, disclosures, targeting settings, conversion paths, and account ownership details before a campaign enters platform review.
           </p>
         </div>
 
         <div class="p-6 rounded-2xl bg-brand-surface border border-brand-border">
           <div class="flex items-center gap-3 mb-2">
             <span class="px-2.5 py-0.5 rounded bg-brand/10 text-brand font-mono font-bold text-xs uppercase">Layer 3</span>
-            <h3 class="text-base font-bold text-white">Invoiced Corporate Credit Lines</h3>
+            <h3 class="text-base font-bold text-white">Billing and Continuity Planning</h3>
           </div>
           <p class="text-xs text-slate-400 leading-relaxed">
-            Eliminate credit card velocity decline triggers during aggressive capital deployment. Monthly direct invoicing lines allow $50k-$250k+ daily spend without payment authorization friction.
+            Map payment methods, account access, support paths, and operational handoffs. Volume terms are discussed against the actual operating model.
           </p>
         </div>
       </div>
     </section>
 
-    
-        <!-- Source-Backed Audited Proof Block -->
+    <!-- Review Scope -->
     <section class="py-12 border-t border-brand-border bg-brand-surface/20">
       <div class="max-w-6xl mx-auto px-4 sm:px-6">
         <div class="max-w-4xl mx-auto p-6 sm:p-8 rounded-2xl bg-brand-surface border border-brand/30">
-          <div class="text-xs font-mono font-bold uppercase tracking-widest text-brand mb-2">Audited Performance &amp; Infrastructure Proof</div>
-          <h3 class="text-2xl font-extrabold text-white mb-2">Source-Backed Operational Proof for Regulated Lenders</h3>
-          <p class="text-xs text-slate-400 mb-6">Independently verifiable infrastructure metrics across audited high-spend fintech and merchant cash advance portfolios:</p>
+          <div class="text-xs font-mono font-bold uppercase tracking-widest text-brand mb-2">Review Scope</div>
+          <h3 class="text-2xl font-extrabold text-white mb-2">What We Can Review With You</h3>
+          <p class="text-xs text-slate-400 mb-6">We focus on the information needed to assess fit and prepare a practical next step.</p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="p-4 rounded-xl bg-brand-bg border border-brand-border">
-              <div class="text-2xl font-extrabold text-white font-mono mb-1">$14.2M</div>
-              <div class="text-xs text-brand font-mono font-bold mb-1">Audited Regulated Spend</div>
-              <div class="text-xs text-slate-400 leading-relaxed">Processed across Meta Financial Services Ad Partner and Google FSV MCC lines in 2025–2026.</div>
+              <div class="text-lg font-extrabold text-white font-mono mb-1">Account setup</div>
+              <div class="text-xs text-brand font-mono font-bold mb-1">Ownership and access</div>
+              <div class="text-xs text-slate-400 leading-relaxed">Map account structure, permissions, billing dependencies, and operational handoffs.</div>
             </div>
             <div class="p-4 rounded-xl bg-brand-bg border border-brand-border">
-              <div class="text-2xl font-extrabold text-white font-mono mb-1">99.6%</div>
-              <div class="text-xs text-brand-cyan font-mono font-bold mb-1">Auction Uptime in Sweeps</div>
-              <div class="text-xs text-slate-400 leading-relaxed">Maintained uninterrupted delivery throughout Q1 2026 Meta Special Ad Category (SAC) algorithm sweeps.</div>
+              <div class="text-lg font-extrabold text-white font-mono mb-1">Policy readiness</div>
+              <div class="text-xs text-brand-cyan font-mono font-bold mb-1">Requirements and limits</div>
+              <div class="text-xs text-slate-400 leading-relaxed">Review platform-specific targeting, creative, verification, and disclosure requirements.</div>
             </div>
             <div class="p-4 rounded-xl bg-brand-bg border border-brand-border">
-              <div class="text-2xl font-extrabold text-white font-mono mb-1">38 min</div>
-              <div class="text-xs text-amber-400 font-mono font-bold mb-1">Avg Replacement SLA</div>
-              <div class="text-xs text-slate-400 leading-relaxed">Verified contingency cutover speed across 114 enterprise lending and MCA account migrations.</div>
+              <div class="text-lg font-extrabold text-white font-mono mb-1">Continuity plan</div>
+              <div class="text-xs text-amber-400 font-mono font-bold mb-1">Dependencies and options</div>
+              <div class="text-xs text-slate-400 leading-relaxed">Discuss billing, access, and support paths while platform decisions remain with the relevant platform.</div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Transparent Pricing & SLAs -->
+
+    <!-- Transparent Pricing -->
     <section id="pricing" class="py-16 sm:py-24 border-t border-brand-border bg-brand-surface/40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center max-w-3xl mx-auto mb-16">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 border border-brand/30 text-brand text-xs font-mono font-bold uppercase tracking-wider mb-4">
-            Transparent Pricing &amp; SLAs
+            Transparent Pricing
           </div>
           <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
-            One Base Rate. Volume Pricing for High-Spend Lending.
+            One Base Rate. Volume Terms Discussed Directly.
           </h2>
           <p class="text-slate-400 text-sm sm:text-base">
-            No monthly retainers. No setup fees. Transparent 2.5% fee on managed ad spend with pre-attested Special Ad Category (SAC) compliance and direct platform partner escalation.
+            The base rate is 2.5% of managed ad spend. Volume terms can be discussed after reviewing the actual platform mix, account structure, and billing requirements.
           </p>
         </div>
 
@@ -366,53 +474,121 @@
             <span class="text-sm sm:text-base text-slate-400 font-mono">base rate on managed spend</span>
           </div>
           <p class="text-slate-300 text-sm max-w-md mx-auto mb-8">
-            Qualifying Spend Floor: $50,000/month. Base Fee: 2.5% on managed spend ($50K–$500K/mo). Volume Tiering: 1.8% ($500K–$1M/mo) and 1.2% (&gt;$1M/mo). Zero setup fees, zero monthly retainers, zero seat charges.
+            We discuss scope, billing setup, and any volume terms against the proposed operating model. Platform eligibility, approval, and delivery remain subject to the relevant platform’s review.
           </p>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 text-left text-xs font-mono text-slate-300">
-            <div class="flex items-center gap-2"><span class="text-brand">✓</span> No monthly retainers or upfront fees</div>
-            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Pre-cleared Special Ad Category lines</div>
-            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Direct platform representative access</div>
-            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Volume pricing from $500K/mo spend</div>
-            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Invoiced lines of credit (zero CC holds)</div>
-            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Guaranteed 4-hr cutover failover SLA</div>
+            <div class="flex items-center gap-2"><span class="text-brand">✓</span> 2.5% base rate on managed spend</div>
+            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Volume terms discussed directly</div>
+            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Platform requirements review</div>
+            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Billing and access review</div>
+            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Landing-page disclosure review</div>
+            <div class="flex items-center gap-2"><span class="text-brand">✓</span> Continuity planning options</div>
           </div>
 
           <div class="pt-6 border-t border-brand-border">
-            <a href="https://wa.me/15083103096?text=Hi%20%E2%80%94%20I%20manage%20fintech%20or%20MCA%20ad%20spend%20and%20want%20to%20discuss%20hardened%20agency%20infrastructure." target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-brand text-black font-mono font-bold text-sm uppercase tracking-wider hover:bg-brand-dark transition-all shadow-lg glow-accent min-h-[44px]">
+            <a href="https://wa.me/15083103096?text=Hi%20%E2%80%94%20I%20manage%20fintech%20or%20MCA%20ad%20spend%20and%20want%20to%20discuss%20our%20ad%20infrastructure%20review." target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-brand text-black font-mono font-bold text-sm uppercase tracking-wider hover:bg-brand-dark transition-all shadow-lg glow-accent min-h-[44px]">
               <span>Message us on WhatsApp</span>
               <span>&rarr;</span>
             </a>
             <p class="text-slate-500 text-xs font-mono mt-4">
-              Direct WhatsApp Desk: +1 (508) 310-3096 &bull; One conversation covers monthly spend, compliance &amp; account allocation
+              Direct WhatsApp Desk: +1 (508) 310-3096 &bull; Urgent questions can start there.
             </p>
           </div>
         </div>
 
         <div class="bg-brand-bg/60 border border-brand-border rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-3xl mx-auto">
           <div class="text-xs text-slate-300 font-mono text-center sm:text-left">
-            <strong class="text-white">High-Volume Lending (&gt;$500K/mo):</strong> Active credit card, debt relief, and MCA portfolios qualify for tiered fee schedules.
+            <strong class="text-white">Need a volume conversation?</strong> Share the operating model and platform mix; terms are reviewed case by case.
           </div>
-          <a href="https://wa.me/15083103096?text=Hi%20%E2%80%94%20our%20fintech%20portfolio%20spends%20past%20%24500K%2Fmo%20and%20wants%20to%20discuss%20volume%20pricing%20tiers." target="_blank" rel="noopener" class="text-brand font-mono font-bold text-xs uppercase hover:underline shrink-0 min-h-[28px] inline-flex items-center">
-            Talk to an Infrastructure Specialist &rarr;
+          <a href="#contact" class="text-brand font-mono font-bold text-xs uppercase hover:underline shrink-0 min-h-[28px] inline-flex items-center">
+            Request a review &rarr;
           </a>
         </div>
       </div>
     </section>
 
-    <!-- Operational CTA Section -->
+    <!-- Closing CTA -->
     <section class="py-16 bg-brand-surface border-t border-brand-border">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">
-          Deploy Hardened Lending Ad Infrastructure
+          Review Your Fintech Ad Infrastructure
         </h2>
         <p class="text-slate-400 text-sm max-w-xl mx-auto mb-8">
-          Speak with our lead fintech media architect to audit your landing page compliance and provision pre-attested agency accounts in under 4 hours.
+          Share the platform mix and operating context. We’ll review the relevant requirements and reply by email.
         </p>
-        <a href="https://wa.me/15083103096?text=Hi%2C%20I%20manage%20fintech%20or%20MCA%20ad%20spend%20and%20need%20hardened%20infrastructure." target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-brand text-black font-mono font-bold text-sm uppercase tracking-wider hover:bg-brand-dark transition-all shadow-lg glow-accent">
-          <span>Connect with Lending Architect on WhatsApp</span>
-          <span>&rarr;</span>
-        </a>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="#contact" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-brand text-black font-mono font-bold text-sm uppercase tracking-wider hover:bg-brand-dark transition-all shadow-lg glow-accent min-h-[44px]">
+            <span>Request a fintech infrastructure review</span>
+            <span>&rarr;</span>
+          </a>
+          <a href="https://wa.me/15083103096?text=Hi%2C%20I%20manage%20fintech%20or%20MCA%20ad%20spend%20and%20need%20an%20infrastructure%20review." target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-brand-border text-white font-mono font-bold text-sm uppercase tracking-wider hover:border-brand/40 transition-all min-h-[44px]">
+            <span>Urgent WhatsApp desk</span>
+            <span>&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Primary Contact Form -->
+    <section id="contact" class="py-16 sm:py-24 border-t border-brand-border bg-brand-bg">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/10 border border-brand/30 text-brand text-xs font-mono font-bold uppercase tracking-wider mb-4">
+            Contact the Review Desk
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+            Request a fintech infrastructure review
+          </h2>
+          <p class="text-slate-400 text-sm sm:text-base">
+            Tell us what you need to review across your account, billing, landing page, or platform setup.
+          </p>
+        </div>
+
+        <noscript><p>This form needs JavaScript. You can <a href="https://wa.me/15083103096">contact us on WhatsApp</a> instead.</p></noscript>
+        <form id="contact-form" method="post" action="https://adsinfra.io/api/leads/satellite" class="bg-brand-surface border border-brand-border rounded-2xl p-6 sm:p-8">
+          <div class="space-y-5">
+            <div>
+              <label for="contact-email" class="block text-sm font-semibold text-white mb-2">Work email <span class="text-brand" aria-hidden="true">*</span></label>
+              <input id="contact-email" name="email" type="email" required maxlength="254" autocomplete="email" placeholder="you@company.com" class="w-full rounded-xl bg-brand-bg border border-brand-border px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand">
+            </div>
+
+            <div>
+              <label for="contact-company" class="block text-sm font-semibold text-white mb-2">Company or website <span class="text-slate-500 font-normal">(optional)</span></label>
+              <input id="contact-company" name="company" type="text" maxlength="160" autocomplete="organization" placeholder="Your company or public website" class="w-full rounded-xl bg-brand-bg border border-brand-border px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand">
+            </div>
+
+            <div>
+              <label for="contact-need" class="block text-sm font-semibold text-white mb-2">What do you need? <span class="text-brand" aria-hidden="true">*</span></label>
+              <select id="contact-need" name="need" required class="w-full rounded-xl bg-brand-bg border border-brand-border px-4 py-3 text-white focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand">
+                <option value="" selected disabled>Select one</option>
+                <option value="account_issue">Account issue</option>
+                <option value="new_setup">New setup</option>
+                <option value="billing">Billing</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="contact-message" class="block text-sm font-semibold text-white mb-2">Context <span class="text-slate-500 font-normal">(optional)</span></label>
+              <textarea id="contact-message" name="message" maxlength="2000" rows="5" placeholder="A short description of the setup or question you want to review." class="w-full rounded-xl bg-brand-bg border border-brand-border px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand"></textarea>
+            </div>
+
+            <div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;opacity:0;">
+              <label for="contact-website">Website</label>
+              <input id="contact-website" name="website" type="text" tabindex="-1" autocomplete="off" maxlength="160">
+            </div>
+
+            <p class="text-xs text-slate-400 leading-relaxed">
+              This is a business inquiry. Please do not include client, case, or borrower financial details, credentials, or documents. We use these details to respond to this inquiry; no marketing opt-in is required. See our <a href="https://adsinfra.io/privacy" class="text-brand underline underline-offset-2">Privacy Notice</a>.
+            </p>
+
+            <button type="submit" disabled class="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-brand text-black font-mono font-bold text-sm uppercase tracking-wider hover:bg-brand-dark transition-all shadow-lg glow-accent min-h-[48px] disabled:opacity-60 disabled:cursor-wait">
+              Request review
+            </button>
+            <p id="contact-status" role="status" aria-live="polite" class="min-h-[1.25rem] text-sm text-slate-400"></p>
+          </div>
+        </form>
       </div>
     </section>
   </main>
