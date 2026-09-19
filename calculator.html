@@ -37,18 +37,17 @@
     }
   </script>
 
-  <script defer src="https://search-ops-beacon.aria-24d.workers.dev/analytics/v2.js" data-site="fintechadinfra.com">
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    document.addEventListener("click", function(e) {
-      var target = e.target && e.target.closest ? e.target.closest('a[href*="wa.me"]') : null;
+  <script defer src="https://search-ops-beacon.aria-24d.workers.dev/analytics/v2.js" data-site="fintechadinfra.com"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      document.addEventListener("click", function(e) {
+        var target = e.target && e.target.closest ? e.target.closest("a[href*=\"wa.me\"]") : null;
       if (target && window.searchOps && typeof window.searchOps.track === "function") {
         window.searchOps.track("whatsapp_click");
       }
     });
   });
-</script>
+  </script>
 </head>
 <body class="bg-brand-bg text-brand-text font-sans antialiased selection:bg-brand selection:text-black">
 
