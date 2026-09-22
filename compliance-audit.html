@@ -170,5 +170,54 @@
   <footer class="border-t border-brand-border py-8 text-center text-xs text-slate-500 font-mono mt-16">
     <p>&copy; 2026 Fintech Ad Infrastructure &bull; An enterprise intelligence initiative by <a href="https://adsinfra.io" class="text-brand" style="min-height: 28px; display: inline-flex; align-items: center; padding: 2px 4px;">AdsInfra</a>.</p>
   </footer>
+  <script>
+    // ADSINFRA_INTENT_BEACON (2026-09-21): centralized WhatsApp intent
+    // attribution. Reports CTA clicks to the AdsInfra D1 intent endpoint via
+    // navigator.sendBeacon: fire-and-forget, never delays navigation. Runs
+    // alongside the Search Ops whatsapp_click beacon; both fire.
+    (function () {
+      var SITE_TAG = "fintech";
+      var ENDPOINT = "https://adsinfra.io/api/intent";
+      function bounded(v, n) {
+        if (typeof v !== "string" || !v) return undefined;
+        return v.slice(0, n);
+      }
+      function referrerHost() {
+        try {
+          var h = new URL(document.referrer).hostname;
+          return bounded(h, 120);
+        } catch (e) {
+          return undefined;
+        }
+      }
+      var params = new URLSearchParams(location.search);
+      var payload = {
+        cta_id: "whatsapp",
+        site: SITE_TAG,
+        path: bounded(location.pathname, 200),
+        referrer_host: referrerHost(),
+        utm_source: bounded(params.get("utm_source"), 120),
+        utm_medium: bounded(params.get("utm_medium"), 120),
+        utm_campaign: bounded(params.get("utm_campaign"), 180),
+      };
+      document.addEventListener("click", function (e) {
+        var t =
+          e.target && e.target.closest
+            ? e.target.closest('a[href*="wa.me"]')
+            : null;
+        if (!t) return;
+        try {
+          if (navigator.sendBeacon) {
+            var blob = new Blob([JSON.stringify(payload)], {
+              type: "text/plain;charset=UTF-8",
+            });
+            navigator.sendBeacon(ENDPOINT, blob);
+          }
+        } catch (err) {
+          /* attribution must never break the click */
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
