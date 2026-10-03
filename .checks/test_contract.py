@@ -33,6 +33,11 @@ class HomepageContractTests(unittest.TestCase):
         cls.browser = cls.playwright.chromium.launch(headless=True)
         cls.base_url = f"http://127.0.0.1:{cls.server.server_port}"
 
+    def offline_page(self, **options):
+        page = self.browser.new_page(**options)
+        page.route("**/*", lambda route: route.continue_() if route.request.url.startswith(self.base_url) else route.abort())
+        return page
+
     @classmethod
     def tearDownClass(cls) -> None:
         cls.browser.close()
@@ -42,7 +47,7 @@ class HomepageContractTests(unittest.TestCase):
         cls.server_thread.join(timeout=2)
 
     def open_page(self, *, search_ops: str | None = None) -> Page:
-        page = self.browser.new_page()
+        page = self.offline_page()
         # Keep smoke tests from sending events to production analytics.
         page.route(
             "https://search-ops-beacon.aria-24d.workers.dev/analytics/v2.js",
@@ -142,7 +147,7 @@ class HomepageContractTests(unittest.TestCase):
         page.close()
 
     def test_no_javascript_keeps_submit_disabled_and_whatsapp_available(self) -> None:
-        page = self.browser.new_page(java_script_enabled=False)
+        page = self.offline_page(java_script_enabled=False)
         page.goto(self.base_url + "/index.html", wait_until="domcontentloaded")
         self.assertTrue(page.locator("#contact-form button[type=submit]").is_disabled())
         self.assertTrue(page.locator("noscript a[href='https://wa.me/15083103096']").is_visible())
@@ -236,6 +241,55 @@ class HomepageContractTests(unittest.TestCase):
         self.assertGreaterEqual(whatsapp.count(), 1)
         self.assertTrue(whatsapp.first.is_visible())
         self.assertIn("wa.me/15083103096", whatsapp.first.get_attribute("href") or "")
+        page.close()
+
+
+    def test_resource_initial_html_navigation_and_mobile_layout(self):
+        page = self.offline_page(java_script_enabled=False, viewport={"width": 375, "height": 812})
+        response = page.goto(self.base_url + "/resources/google-ads-financial-services-verification-agency-handover.html")
+        self.assertEqual(response.status, 200)
+        self.assertEqual(page.locator("h1").count(), 1)
+        self.assertGreater(page.locator("article h2").count(), 4)
+        canonical = page.locator('link[rel="canonical"]').get_attribute("href")
+        self.assertEqual(canonical, "https://fintechadinfra.com/resources/google-ads-financial-services-verification-agency-handover")
+        data = json.loads(page.locator('script[type="application/ld+json"]').text_content())
+        self.assertEqual(data["mainEntityOfPage"], canonical)
+        self.assertEqual(data["headline"], page.locator("h1").inner_text())
+        self.assertEqual(page.locator('article a[href="/#contact"]').count(), 1)
+        self.assertGreater(page.locator('article a[href^="https://support.google.com/"]').count(), 2)
+        self.assertFalse(page.evaluate("document.documentElement.scrollWidth > window.innerWidth"))
+        page.get_by_role("link", name="Resources", exact=True).click()
+        self.assertEqual(page.url, self.base_url + "/resources/")
+        link = page.locator('a[href="/resources/google-ads-financial-services-verification-agency-handover"]')
+        self.assertTrue(link.is_visible())
+        page.goto(self.base_url + "/resources/google-ads-financial-services-verification-agency-handover.html")
+        page.locator('article a[href="/#contact"]').click()
+        page.locator("#contact-form").wait_for(state="visible")
+        self.assertTrue(page.locator("#contact-form").is_visible())
+        page.close()
+
+    def test_legacy_resource_keeps_canonical_and_evidence_path(self):
+        page = self.offline_page(java_script_enabled=False)
+        self.assertEqual(page.goto(self.base_url + "/resources/fintech-mca-ad-compliance-and-special-ad-category-playbook.html").status, 200)
+        self.assertEqual(page.locator('link[rel="canonical"]').get_attribute("href"), "https://fintechadinfra.com/resources/fintech-mca-ad-compliance-and-special-ad-category-playbook")
+        self.assertEqual(page.locator('a[href="/resources/google-ads-financial-services-verification-agency-handover"]').count(), 1)
+        self.assertEqual(page.locator('article a[href="/#contact"]').count(), 1)
+        page.close()
+
+    def test_checklist_tracks_completed_tasks_without_approval_score(self):
+        page = self.offline_page()
+        page.goto(self.base_url + "/compliance-audit.html")
+        self.assertEqual(page.locator("#scoreText").inner_text(), "0 of 4 review tasks recorded")
+        self.assertEqual(page.locator("input:checked").count(), 0)
+        for count in range(1, 5):
+            page.locator(f"#q{count}").check()
+            self.assertEqual(page.locator("#scoreText").inner_text(), f"{count} of 4 review tasks recorded")
+        page.locator("#q2").uncheck()
+        self.assertEqual(page.locator("#scoreText").inner_text(), "3 of 4 review tasks recorded")
+        self.assertEqual(page.locator("#auditCta").get_attribute("href"), "/#contact")
+        page.locator("#auditCta").click()
+        page.locator("#contact-form").wait_for(state="visible")
+        self.assertTrue(page.locator("#contact-form").is_visible())
         page.close()
 
 
