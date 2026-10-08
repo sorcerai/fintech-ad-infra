@@ -2,7 +2,7 @@
 
 Audience: financial-services growth lead preparing proposed MCA advertising with a qualified product/market reviewer. Page job: identify missing claim evidence before submission. CTA: existing /#contact infrastructure inquiry; no borrower information or credentials. No change to offer, recipient, public route, analytics or verification guide.
 
-Opportunity: the prior writer kit recommended a claim ledger for the existing playbook. The only observed topical query, “mca pre written ads”, had one impression in September; this is weak intent evidence, not proven demand or a qualified lead. Current Analytics allowlist excludes Fintech; no new analytics access was requested. No open Fintech PR returned on 8 October. PR5’s handover guide is already merged; this refresh serves copy review rather than duplicating account handover.
+Opportunity: the prior writer kit recommended a claim ledger for the existing playbook. Search observations are weak intent evidence, not proven demand or a qualified lead; analytics observations remain private editorial evidence and no new analytics access was requested. No open Fintech PR returned on 8 October. PR5’s handover guide is already merged; this refresh serves copy review rather than duplicating account handover.
 
 ## Source and claim map
 
