@@ -269,11 +269,23 @@ class HomepageContractTests(unittest.TestCase):
         page.close()
 
     def test_legacy_resource_keeps_canonical_and_evidence_path(self):
-        page = self.offline_page(java_script_enabled=False)
+        # The served HTML is the public article contract, including its worksheet.
+        page = self.offline_page(java_script_enabled=False, viewport={"width": 320, "height": 812})
         self.assertEqual(page.goto(self.base_url + "/resources/fintech-mca-ad-compliance-and-special-ad-category-playbook.html").status, 200)
-        self.assertEqual(page.locator('link[rel="canonical"]').get_attribute("href"), "https://fintechadinfra.com/resources/fintech-mca-ad-compliance-and-special-ad-category-playbook")
+        canonical = page.locator('link[rel="canonical"]').get_attribute("href")
+        self.assertEqual(canonical, "https://fintechadinfra.com/resources/fintech-mca-ad-compliance-and-special-ad-category-playbook")
+        data = json.loads(page.locator('script[type="application/ld+json"]').text_content())
+        self.assertEqual(data["mainEntityOfPage"], canonical)
+        self.assertEqual(data["headline"], page.locator("h1").inner_text())
+        worksheet = page.get_by_role("definition").all_inner_texts()
+        self.assertEqual(len(worksheet), 7)
+        self.assertTrue(page.locator('dl[aria-label="Ad-copy evidence worksheet"]').is_visible())
+        self.assertIn("None of these statuses means regulatory compliance or platform approval.", worksheet[-1])
+        self.assertEqual(page.locator('article a[href="https://support.google.com/adspolicy/answer/6020955?hl=en"]').count(), 1)
+        self.assertFalse(page.evaluate("document.documentElement.scrollWidth > window.innerWidth"))
         self.assertEqual(page.locator('a[href="/resources/google-ads-financial-services-verification-agency-handover"]').count(), 1)
-        self.assertEqual(page.locator('article a[href="/#contact"]').count(), 1)
+        page.locator('article a[href="/#contact"]').click()
+        page.locator("#contact-form").wait_for(state="visible")
         page.close()
 
     def test_checklist_tracks_completed_tasks_without_approval_score(self):
