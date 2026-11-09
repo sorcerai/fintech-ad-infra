@@ -5,17 +5,137 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <title>Page not found | Fintech Ad Infrastructure</title>
+  <meta name="description" content="This page did not clear review. Return to Fintech Ad Infrastructure.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: "#27F17B",
+              dark: "#1ecb66",
+              bg: "#080B10",
+              surface: "#0E1420",
+              card: "#141C2E",
+              border: "#1E293B",
+              text: "#E2E8F0",
+              textMuted: "#94A3B8",
+              cyan: "#00D2FF",
+              amber: "#F59E0B",
+              rose: "#FF4B4B"
+            }
+          },
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; font-family: system-ui, -apple-system, sans-serif; background: #0b1220; color: #e5e7eb; }
-    main { padding: 2rem; max-width: 32rem; text-align: center; }
-    a { color: #60a5fa; }
+    body {
+      background-color: #080B10;
+      color: #E2E8F0;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
   </style>
 </head>
-<body>
-  <main>
-    <h1>Page not found</h1>
-    <p>This page doesn't exist on Fintech Ad Infrastructure.</p>
-    <p><a href="/">Go to the homepage</a></p>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand selection:text-black">
+
+  <!-- Navigation -->
+  <header class="sticky top-0 z-50 border-b border-brand-border bg-[#080B10]/95 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-brand flex items-center justify-center font-mono font-bold text-black text-xs">FT</div>
+        <span class="font-bold text-white text-base sm:text-lg tracking-tight">Fintech<span class="text-brand">AdInfra</span></span>
+      </a>
+      <span class="text-xs uppercase tracking-widest font-mono text-brand-textMuted border-l border-brand-border pl-3 ml-1 hidden sm:inline">Lending Infrastructure</span>
+    </div>
+    <nav class="flex items-center gap-4 text-xs sm:text-sm font-mono">
+      <a href="/calculator" class="text-slate-300 hover:text-brand transition-colors hidden md:inline">Loss Calculator</a>
+      <a href="/compliance-audit" class="text-slate-300 hover:text-brand transition-colors hidden sm:inline">Compliance Audit</a>
+      <a href="/resources/" class="text-slate-300 hover:text-brand transition-colors inline-flex items-center min-h-[28px] py-1 px-1.5">Resources</a>
+      <a href="/#contact" class="px-3.5 py-1.5 rounded-lg bg-brand text-black font-semibold text-xs uppercase tracking-wider hover:bg-brand-dark transition-colors font-mono">
+        Request review
+      </a>
+    </nav>
+  </header>
+
+  <main class="flex-grow">
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-14 pb-20 text-center">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand/10 border border-brand/30 text-brand text-xs font-mono font-bold uppercase tracking-wider mb-6">
+        <span>Error 404 &bull; Page not found</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 max-w-4xl mx-auto">
+        This page didn't <span class="text-brand">clear review.</span>
+      </h1>
+
+      <p class="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
+        The link may be old or mistyped. Head back to the homepage, or open one of the pages below.
+      </p>
+
+      <!-- Review readout -->
+      <div class="max-w-md mx-auto mb-10 p-4 rounded-xl bg-brand-surface border border-brand-border/50 text-left font-mono text-xs sm:text-sm leading-relaxed" aria-hidden="true">
+        <div><span class="text-brand-textMuted">review_status</span>: <span class="text-brand-rose font-bold">404_not_found</span></div>
+        <div><span class="text-brand-textMuted">special_ad_category</span>: <span class="text-amber-400">n/a</span></div>
+        <div><span class="text-brand-textMuted">disclosures</span>: <span class="text-amber-400">none</span></div>
+        <div><span class="text-brand-textMuted">next_step</span>: <span class="text-brand">&quot;return to homepage&quot;</span></div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <a href="/" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand text-black font-bold text-sm uppercase tracking-wider hover:bg-brand-dark transition-all duration-200 shadow-lg inline-flex items-center justify-center gap-2 font-mono">
+          <span>&larr;</span>
+          <span>Back to the homepage</span>
+        </a>
+        <a href="/compliance-audit" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-surface border border-brand-border hover:border-brand/40 text-white font-semibold text-sm transition-all duration-200 font-mono">
+          Run the Compliance Audit &rarr;
+        </a>
+      </div>
+
+      <!-- Helpful links -->
+      <h2 class="text-xs font-mono font-bold text-brand uppercase tracking-wider mb-4">Most useful pages</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+        <a href="/calculator" class="block p-4 rounded-xl bg-brand-surface border border-brand-border/50 hover:border-brand/40 transition-colors text-left">
+          <div class="text-xs font-mono text-brand mb-1">TOOL</div>
+          <div class="text-lg font-bold text-white">Loss Calculator</div>
+          <div class="text-xs text-slate-400">Lending CAC and downtime</div>
+        </a>
+        <a href="/compliance-audit" class="block p-4 rounded-xl bg-brand-surface border border-brand-border/50 hover:border-brand/40 transition-colors text-left">
+          <div class="text-xs font-mono text-brand-cyan mb-1">CHECKLIST</div>
+          <div class="text-lg font-bold text-white">Compliance Audit</div>
+          <div class="text-xs text-slate-400">Advertising review checklist</div>
+        </a>
+        <a href="/resources/" class="block p-4 rounded-xl bg-brand-surface border border-brand-border/50 hover:border-brand/40 transition-colors text-left">
+          <div class="text-xs font-mono text-amber-400 mb-1">GUIDES</div>
+          <div class="text-lg font-bold text-white">Resources</div>
+          <div class="text-xs text-slate-400">Lending ad compliance</div>
+        </a>
+        <a href="/resources/fintech-mca-ad-compliance-and-special-ad-category-playbook" class="block p-4 rounded-xl bg-brand-surface border border-brand-border/50 hover:border-brand/40 transition-colors text-left">
+          <div class="text-xs font-mono text-brand mb-1">PLAYBOOK</div>
+          <div class="text-lg font-bold text-white">MCA Ad Review</div>
+          <div class="text-xs text-slate-400">Evidence and readiness</div>
+        </a>
+      </div>
+    </section>
   </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-brand-border py-8 text-center text-xs text-slate-400 font-mono">
+    <p>&copy; 2026 Fintech Ad Infrastructure &bull; An enterprise intelligence initiative by <a href="https://adsinfra.io" class="text-brand inline-flex items-center min-h-[28px] p-1 underline" style="min-height: 28px; display: inline-flex; align-items: center; padding: 2px 4px;">AdsInfra</a>.</p>
+  </footer>
 </body>
 </html>
