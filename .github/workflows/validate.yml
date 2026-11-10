@@ -9,7 +9,8 @@ permissions:
 
 jobs:
   contract:
-    runs-on: ubuntu-latest
+    # ubuntu-latest is 26.04, where this Playwright version cannot install Chromium.
+    runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
       - name: Check out repository
